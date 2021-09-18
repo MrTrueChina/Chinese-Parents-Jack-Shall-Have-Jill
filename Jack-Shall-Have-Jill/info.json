@@ -3,6 +3,9 @@
     "DisplayName": "有情人终成眷属 - Jack Shall Have Jill",
     "Author": "Mr.true.China",
     "Version": "1.0.0",
+    "LoadAfter": [
+        "MtC.Mod.ChineseParents.Yuri"
+    ],
     "AssemblyName": "Jack-Shall-Have-Jill.dll",
     "EntryMethod": "MtC.Mod.ChineseParents.JackShallHaveJill.Main.Load"
 }

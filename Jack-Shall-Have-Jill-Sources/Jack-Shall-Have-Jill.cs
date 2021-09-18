@@ -134,104 +134,59 @@ namespace MtC.Mod.ChineseParents.JackShallHaveJill
     ////////--------////////--------//////// 修改求婚成功率 ////////--------////////--------////////
 
     /// <summary>
-    /// 在获取相亲可选人物时获取同学的方法
+    /// 获取所有相亲选项的方法
     /// </summary>
-    [HarmonyPatch(typeof(Panel_blinddate), "ChooseClassmate")]
-    public static class Panel_blinddate_ChooseClassmate
+    [HarmonyPatch(typeof(Panel_blinddate), "create_blinddates")]
+    public static class Panel_blinddate_create_blinddates
     {
-        private static bool Prefix(Panel_blinddate __instance)
+        private static void Postfix(Panel_blinddate __instance)
         {
-            // 如果 Mod 未启动则直接按照游戏原本的逻辑进行调用
+            // 如果 Mod 未启动则不处理
             if (!Main.enabled)
             {
-                return true;
+                return;
             }
 
-            Main.ModEntry.Logger.Log("在相亲列表中添加同学方法即将调用");
+            Main.ModEntry.Logger.Log("在相亲列表中添加同学方法调用完毕");
 
-            // 以下代码直接复制粘贴自反编译
-            if (__instance.Blinddates.Count == 0)
+            // 根据对反编译代码的阅读可以确认以下几点：
+            // 1.Blinddates 是相亲选项的容器
+            // 2.ChooseClassmate 负责添加第一个相亲对象，这个对象是同学，可能添加失败
+            // 3.ChooseClassmate 只有在 Blinddates 中没有元素的情况下才会尝试添加相亲对象
+            // 4.create_blinddates 无论如何会尝试添加满三个相亲对象
+            // 所以正确的思路是在 create_blinddates 打后缀，并在后缀中对是同学的选项进行成功率调整
+
+            // 遍历所有相亲选项
+            __instance.Blinddates.ForEach(blinddate =>
             {
-                if (record_manager.InstanceManagerRecord.IsBoy())
+                float loving = 0;
+
+                // 相亲选项的 id 在女同学 id 列表里，说明这个相亲选项是女同学
+                if (girlmanager.InstanceGirlmanager != null && girlmanager.InstanceGirlmanager.GirlsDictionary != null && girlmanager.InstanceGirlmanager.GirlsDictionary.ContainsKey(blinddate.id))
                 {
-                    int x2 = (from x in girlmanager.InstanceGirlmanager.GirlsDictionary.Keys
-                              select new
-                              {
-                                  x = x,
-                                  y = girlmanager.InstanceGirlmanager.GirlsDictionary[x]
-                              } into x
-                              orderby x.y descending
-                              select x).First().x;
-                    blinddate blinddate = blinddate.create(x2);
-
-                    ////----////----//// Mod 替换逻辑 ////----////----////
-
-                    //// 原有的成功率计算逻辑，概率 = 好感度，最大 80
-                    //blinddate.base_winrate = Mathf.Min(80, girlmanager.InstanceGirlmanager.GirlsDictionary[x2]);
-
-                    // 好感度
-                    int loving = girlmanager.InstanceGirlmanager.GirlsDictionary[x2];
-
-                    if(loving <= 100)
-                    {
-                        // 好感度小于等于 100，按照原有逻辑，概率 = 好感度，最大 80
-                        blinddate.base_winrate = Mathf.Clamp(loving, 0, 80);
-                    }
-                    else
-                    {
-                        // 好感度大于 100，在 80 的基础上匀速增长到 100
-                        blinddate.base_winrate = Mathf.Clamp((int)(80 + (float)loving / (Main.maxLoving - 100) * 20), 80, 100);
-                    }
-
-                    // 保留原有的计算逻辑
-                    blinddate.base_winrate = Mathf.Min(80, girlmanager.InstanceGirlmanager.GirlsDictionary[x2]);
-
-
-                    // 如果好感度大于 100，对成功率进行补正
-                    if(girlmanager.InstanceGirlmanager.GirlsDictionary[x2] > 100)
-                    {
-                        blinddate.base_winrate += (girlmanager.InstanceGirlmanager.GirlsDictionary[x2] - 100) / (Main.maxLoving - 100) * 20;
-                    }
-
-                    ////----////----//// Mod 替换逻辑 ////----////----////
-
-                    // 以下代码直接复制粘贴自反编译
-                    __instance.Blinddates.Add(blinddate);
-                    GameAnalytics.NewDesignEvent(begin_analytic.GirlMostPop + x2);
+                    // 按照女同学的方式读取这个同学的好感值
+                    loving = girlmanager.InstanceGirlmanager.GirlsDictionary[blinddate.id];
                 }
-                else
+
+                if (BoysManager.Instance != null && BoysManager.Instance.BoysDictionary != null && BoysManager.Instance.BoysDictionary.ContainsKey(blinddate.id))
                 {
-                    int num = BoysManager.Instance.GetMaxLoving(1)[0];
-                    blinddate blinddate2 = blinddate.create(num);
-
-                    ////----////----//// Mod 替换逻辑 ////----////----////
-
-                    //// 原有的成功率计算逻辑，概率 = 好感度，最大 80
-                    //blinddate2.base_winrate = Mathf.Min(80, BoysManager.Instance.BoysDictionary[num].loving);
-
-                    // 好感度
-                    int loving = BoysManager.Instance.BoysDictionary[num].loving;
-
-                    if (loving <= 100)
-                    {
-                        // 好感度小于等于 100，按照原有逻辑，概率 = 好感度，最大 80
-                        blinddate2.base_winrate = Mathf.Clamp(loving, 0, 80);
-                    }
-                    else
-                    {
-                        // 好感度大于 100，在 80 的基础上匀速增长到 100
-                        blinddate2.base_winrate = Mathf.Clamp((int)(80 + (float)loving / (Main.maxLoving - 100) * 20), 80, 100);
-                    }
-
-                    ////----////----//// Mod 替换逻辑 ////----////----////
-
-                    // 以下代码直接复制粘贴自反编译
-                    __instance.Blinddates.Add(blinddate2);
+                    // 按照男同学的方式读取这个同学的好感值
+                    loving = BoysManager.Instance.BoysDictionary[blinddate.id].loving;
                 }
-            }
 
-            // 阻断对原方法的调用
-            return false;
+                // 对好感度超过 100 的选项的成功率进行补正
+                if (loving > 100)
+                {
+                    // 计算最大补正，就是 100% - 当前选项的成功率
+                    int maxCorrection = 100 - blinddate.base_winrate;
+
+                    // 根据好感度计算出补正，
+                    int correction = (int)Mathf.Lerp(0, maxCorrection, ((loving - 100f) / (Main.maxLoving - 100f)));
+
+                    // 添加补正
+                    blinddate.base_winrate += correction;
+                }
+            });
         }
     }
 }
