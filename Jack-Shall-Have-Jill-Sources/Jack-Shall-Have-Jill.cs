@@ -62,7 +62,7 @@ namespace MtC.Mod.ChineseParents.JackShallHaveJill
     ////////--------////////--------//////// 修改好感度上限 ////////--------////////--------////////
 
     /// <summary>
-    /// 获取最大好感值的方法
+    /// 女生面板获取最大好感值的方法
     /// </summary>
     [HarmonyPatch(typeof(XmlData), "GetInt", new Type[] { typeof(string) })]
     public static class XmlData_GetInt
@@ -85,6 +85,49 @@ namespace MtC.Mod.ChineseParents.JackShallHaveJill
 
             // 修改返回值为 Mod 的最大好感度
             __result = Main.maxLoving;
+        }
+    }
+
+    /// <summary>
+    /// 改变男生好感度的方法
+    /// </summary>
+    [HarmonyPatch(typeof(BoysManager), "ChangeLoving")]
+    public static class BoysManager_ChangeLoving
+    {
+        /// <summary>
+        /// 前缀向后缀传递的参数类
+        /// </summary>
+        public class PrefixToPostfixParams
+        {
+            /// <summary>
+            /// 改变男生好感度方法调用前的这个男生的好感度
+            /// </summary>
+            public int beforeLoving;
+
+            public PrefixToPostfixParams(int beforeLoving)
+            {
+                this.beforeLoving = beforeLoving;
+            }
+        }
+
+        private static void Prefix(out PrefixToPostfixParams __state, BoysManager __instance, int boyId, int loving)
+        {
+            // 将方法调用前的这个男同学的好感度发给后缀
+            __state = new PrefixToPostfixParams(__instance.BoysDictionary[boyId].loving);
+        }
+
+        private static void Postfix(PrefixToPostfixParams __state, BoysManager __instance, int boyId, int loving)
+        {
+            // 如果 Mod 未启动则不作处理
+            if (!Main.enabled)
+            {
+                return;
+            }
+
+            Main.ModEntry.Logger.Log("修改男同学最大好感度方法调用完毕");
+
+            // 将好感度改为 方法调用前的好感度 + 增加的好感度，以 Mod 的好感度上限为上限
+            __instance.BoysDictionary[boyId].loving = Mathf.Min(Main.maxLoving, __state.beforeLoving + loving);
         }
     }
 
