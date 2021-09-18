@@ -23,11 +23,6 @@ namespace MtC.Mod.ChineseParents.JackShallHaveJill
         public static bool enabled;
 
         /// <summary>
-        /// 女生面板组件对象
-        /// </summary>
-        public static panel_girls panel_girls;
-
-        /// <summary>
         /// 修改后的最大好感度，到达这个好感度则 100% 求婚成功
         /// </summary>
         public static int maxLoving = 150;
@@ -64,35 +59,36 @@ namespace MtC.Mod.ChineseParents.JackShallHaveJill
         }
     }
 
+    ////////--------////////--------//////// 修改好感度上限 ////////--------////////--------////////
+
     /// <summary>
     /// 获取最大好感值的方法
     /// </summary>
     [HarmonyPatch(typeof(XmlData), "GetInt", new Type[] { typeof(string) })]
     public static class XmlData_GetInt
     {
-        private static bool Prefix(ref int __result, string name)
+        private static void Postfix(ref int __result, string name)
         {
-            // 如果 Mod 未启动则直接按照游戏原本的逻辑进行调用
+            // 如果 Mod 未启动则不作处理
             if (!Main.enabled)
             {
-                return true;
+                return;
             }
 
-            // 如果查询的不是 max_loving，那就不是这个 Mod 需要修改的，按照原逻辑调用
+            // 如果查询的不是 max_loving，那就不是这个 Mod 需要修改的，不作处理
             if (!("max_loving".Equals(name)))
             {
-                return true;
+                return;
             }
 
-            Main.ModEntry.Logger.Log("获取最大好感度方法即将调用");
+            Main.ModEntry.Logger.Log("获取最大好感度方法调用完毕");
 
-            // 修改返回值
+            // 修改返回值为 Mod 的最大好感度
             __result = Main.maxLoving;
-
-            // 阻断原逻辑
-            return false;
         }
     }
+
+    ////////--------////////--------//////// 修改求婚成功率 ////////--------////////--------////////
 
     /// <summary>
     /// 在获取相亲可选人物时获取同学的方法
