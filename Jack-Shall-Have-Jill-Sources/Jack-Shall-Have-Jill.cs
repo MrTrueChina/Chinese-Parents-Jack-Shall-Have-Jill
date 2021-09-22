@@ -10,6 +10,27 @@ using GameAnalyticsSDK;
 
 namespace MtC.Mod.ChineseParents.JackShallHaveJill
 {
+    /// <summary>
+    /// 这个 Mod 的设置
+    /// </summary>
+    public class Settings : UnityModManager.ModSettings, IDrawable
+    {
+        /// <summary>
+        /// 最大好感度，达到这个好感度则 100% 求婚成功
+        /// </summary>
+        [Draw("最大好感度 - Max Loving")]
+        public int maxLoving = 150;
+
+        public override void Save(UnityModManager.ModEntry modEntry)
+        {
+            Save(this, modEntry);
+        }
+
+        public void OnChange()
+        {
+        }
+    }
+
     public static class Main
     {
         /// <summary>
@@ -23,15 +44,20 @@ namespace MtC.Mod.ChineseParents.JackShallHaveJill
         public static bool enabled;
 
         /// <summary>
-        /// 修改后的最大好感度，到达这个好感度则 100% 求婚成功
+        /// 这个 Mod 的设置
         /// </summary>
-        public static int maxLoving = 150;
+        public static Settings settings;
 
         public static bool Load(UnityModManager.ModEntry modEntry)
         {
+            // 读取设置
+            settings = Settings.Load<Settings>(modEntry);
+
             // 保存 Mod 对象
             ModEntry = modEntry;
             ModEntry.OnToggle = OnToggle;
+            ModEntry.OnGUI = OnGUI;
+            ModEntry.OnSaveGUI = OnSaveGUI;
 
             // 加载 Harmony
             var harmony = new Harmony(modEntry.Info.Id);
@@ -56,6 +82,17 @@ namespace MtC.Mod.ChineseParents.JackShallHaveJill
 
             // 返回 true 表示这个 Mod 切换到 Mod Manager 切换的状态，返回 false 表示 Mod 依然保持原来的状态
             return true;
+        }
+
+        static void OnGUI(UnityModManager.ModEntry modEntry)
+        {
+            settings.Draw(modEntry);
+        }
+
+        static void OnSaveGUI(UnityModManager.ModEntry modEntry)
+        {
+            // 保存设置
+            settings.Save(modEntry);
         }
     }
 
@@ -84,7 +121,7 @@ namespace MtC.Mod.ChineseParents.JackShallHaveJill
             Main.ModEntry.Logger.Log("获取最大好感度方法调用完毕");
 
             // 修改返回值为 Mod 的最大好感度
-            __result = Main.maxLoving;
+            __result = Main.settings.maxLoving;
         }
     }
 
@@ -127,7 +164,7 @@ namespace MtC.Mod.ChineseParents.JackShallHaveJill
             Main.ModEntry.Logger.Log("修改男同学最大好感度方法调用完毕");
 
             // 将好感度改为 方法调用前的好感度 + 增加的好感度，以 Mod 的好感度上限为上限
-            __instance.BoysDictionary[boyId].loving = Mathf.Min(Main.maxLoving, __state.beforeLoving + loving);
+            __instance.BoysDictionary[boyId].loving = Mathf.Min(Main.settings.maxLoving, __state.beforeLoving + loving);
         }
     }
 
@@ -166,22 +203,29 @@ namespace MtC.Mod.ChineseParents.JackShallHaveJill
                 {
                     // 按照女同学的方式读取这个同学的好感值
                     loving = girlmanager.InstanceGirlmanager.GirlsDictionary[blinddate.id];
+
+                    Main.ModEntry.Logger.Log("相亲对象是女同学，id = " + blinddate.id + "，名称 = " + blinddate.name + "，好感度 = " + loving);
                 }
 
+                // 相亲选项的 id 在男同学 id 列表里，说明这个相亲选项是男同学
                 if (BoysManager.Instance != null && BoysManager.Instance.BoysDictionary != null && BoysManager.Instance.BoysDictionary.ContainsKey(blinddate.id))
                 {
                     // 按照男同学的方式读取这个同学的好感值
                     loving = BoysManager.Instance.BoysDictionary[blinddate.id].loving;
+
+                    Main.ModEntry.Logger.Log("相亲对象是男同学，id = " + blinddate.id + "，名称 = " + blinddate.name + "，好感度 = " + loving);
                 }
 
                 // 对好感度超过 100 的选项的成功率进行补正
                 if (loving > 100)
                 {
+                    Main.ModEntry.Logger.Log("发现好感度大于 100 的相亲选项，id = " + blinddate.id + "，名称 = " + blinddate.name + "，好感度 = " + loving);
+
                     // 计算最大补正，就是 100% - 当前选项的成功率
                     int maxCorrection = 100 - blinddate.base_winrate;
 
                     // 根据好感度计算出补正，
-                    int correction = (int)Mathf.Lerp(0, maxCorrection, ((loving - 100f) / (Main.maxLoving - 100f)));
+                    int correction = (int)Mathf.Lerp(0, maxCorrection, ((loving - 100f) / (Main.settings.maxLoving - 100f)));
 
                     // 添加补正
                     blinddate.base_winrate += correction;
