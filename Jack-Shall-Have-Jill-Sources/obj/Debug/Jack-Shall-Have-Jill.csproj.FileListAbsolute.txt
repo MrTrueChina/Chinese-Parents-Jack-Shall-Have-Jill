@@ -111,3 +111,5 @@ D:\Projects\Unity-Mod-Manager-Mod\Chinese-Parents\Chinese-Parents-Jack-Shall-Hav
 D:\Projects\Unity-Mod-Manager-Mod\Chinese-Parents\Chinese-Parents-Jack-Shall-Have-Jill\Jack-Shall-Have-Jill-Sources\obj\Debug\Jack-Shall-Have-Jill.csproj.CopyComplete
 D:\Projects\Unity-Mod-Manager-Mod\Chinese-Parents\Chinese-Parents-Jack-Shall-Have-Jill\Jack-Shall-Have-Jill-Sources\obj\Debug\Jack-Shall-Have-Jill.dll
 D:\Projects\Unity-Mod-Manager-Mod\Chinese-Parents\Chinese-Parents-Jack-Shall-Have-Jill\Jack-Shall-Have-Jill-Sources\obj\Debug\Jack-Shall-Have-Jill.pdb
+D:\Projects\Unity-Mod-Manager-Mod\Chinese-Parents\Chinese-Parents-Jack-Shall-Have-Jill\Jack-Shall-Have-Jill-Sources\bin\Debug\Jack-Shall-Have-Jill.xml
+D:\Projects\Unity-Mod-Manager-Mod\Chinese-Parents\Chinese-Parents-Jack-Shall-Have-Jill\Jack-Shall-Have-Jill-Sources\obj\Debug\Jack-Shall-Have-Jill.csprojAssemblyReference.cache

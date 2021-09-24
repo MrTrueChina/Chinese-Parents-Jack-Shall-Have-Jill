@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Jack-Shall-Have-Jill</name>
+    </assembly>
+    <members>
+        <member name="T:MtC.Mod.ChineseParents.JackShallHaveJill.Settings">
+            <summary>
+            这个 Mod 的设置
+            </summary>
+        </member>
+        <member name="F:MtC.Mod.ChineseParents.JackShallHaveJill.Settings.maxLoving">
+            <summary>
+            最大好感度，达到这个好感度则 100% 求婚成功
+            </summary>
+        </member>
+        <member name="P:MtC.Mod.ChineseParents.JackShallHaveJill.Main.ModEntry">
+            <summary>
+            Mod 对象
+            </summary>
+        </member>
+        <member name="F:MtC.Mod.ChineseParents.JackShallHaveJill.Main.enabled">
+            <summary>
+            这个 Mod 是否启动
+            </summary>
+        </member>
+        <member name="F:MtC.Mod.ChineseParents.JackShallHaveJill.Main.settings">
+            <summary>
+            这个 Mod 的设置
+            </summary>
+        </member>
+        <member name="M:MtC.Mod.ChineseParents.JackShallHaveJill.Main.OnToggle(UnityModManagerNet.UnityModManager.ModEntry,System.Boolean)">
+            <summary>
+            Mod Manager 对 Mod 进行控制的时候会调用这个方法
+            </summary>
+            <param name="modEntry"></param>
+            <param name="value">这个 Mod 是否激活</param>
+            <returns></returns>
+        </member>
+        <member name="T:MtC.Mod.ChineseParents.JackShallHaveJill.XmlData_GetInt">
+            <summary>
+            女生面板获取最大好感值的方法
+            </summary>
+        </member>
+        <member name="T:MtC.Mod.ChineseParents.JackShallHaveJill.BoysManager_ChangeLoving">
+            <summary>
+            改变男生好感度的方法
+            </summary>
+        </member>
+        <member name="T:MtC.Mod.ChineseParents.JackShallHaveJill.BoysManager_ChangeLoving.PrefixToPostfixParams">
+            <summary>
+            前缀向后缀传递的参数类
+            </summary>
+        </member>
+        <member name="F:MtC.Mod.ChineseParents.JackShallHaveJill.BoysManager_ChangeLoving.PrefixToPostfixParams.beforeLoving">
+            <summary>
+            改变男生好感度方法调用前的这个男生的好感度
+            </summary>
+        </member>
+        <member name="T:MtC.Mod.ChineseParents.JackShallHaveJill.Panel_blinddate_create_blinddates">
+            <summary>
+            获取所有相亲选项的方法
+            </summary>
+        </member>
+    </members>
+</doc>
