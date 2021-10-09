@@ -126,7 +126,7 @@ namespace MtC.Mod.ChineseParents.JackShallHaveJill
     }
 
     /// <summary>
-    /// 改变男生好感度的方法
+    /// 改变男生最大好感度的方法
     /// </summary>
     [HarmonyPatch(typeof(BoysManager), "ChangeLoving")]
     public static class BoysManager_ChangeLoving
